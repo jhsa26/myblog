@@ -17,3 +17,7 @@ hexo clean 清除缓存文件(db.json) 和已生成的静态文件（public）
 hexo list 列出网站资料
 
 hexo --draft
+
+#
+git remote add origin https://github.com/jhsa26/myblog.git
+git push -u origin master
