@@ -1,0 +1,19 @@
+hexo init 新建一个网站，一般不要用
+
+hexo new [layout] <title> 新建一篇文章，如果没有layout的话，默认使用_config.yml中的default_layout参数代替
+
+hexo g 生成静态网页
+
+hexo sever or hexo s 启动服务器，默认情况下，访问网址为： http://localhost:4000/。
+
+hexo deploy  部署网站  hexo d
+
+完成后部署,让hexo在生成完毕后自动部署网站，两个命令的作用是相同的
+hexo generate --deploy   hexo g -d
+hexo deploy --generate   hexo d -g
+
+hexo clean 清除缓存文件(db.json) 和已生成的静态文件（public）
+
+hexo list 列出网站资料
+
+hexo --draft

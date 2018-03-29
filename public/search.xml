@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+    
+    <entry>
+      <title>寻找重复地震</title>
+      <link href="/2017/08/15/FindEarth/"/>
+      <url>/2017/08/15/FindEarth/</url>
+      <content type="html"><![CDATA[<p>在求取速度变化，应力降，衰减因子变化等都用到了重复地震。所以寻找重复地震以及对重复地震进行聚类分析是重点。这里我不详细讲述原理，详见<a href="http://html.rhhz.net/dqwlxb/20120616.htm" target="_blank" rel="noopener">文章</a>;在2017-07的地震程序培训上，将王宝善老师的速度变化程序中寻找重复地震的程序单独拿出来。并修缮一下，点击<a href="https://pan.baidu.com/s/1nvFn4Op" target="_blank" rel="noopener">下载</a>密码 <strong>7qxe</strong>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/jhsa26/FindingRepeatingEarthquakes.git</span><br></pre></td></tr></table></figure></p><p>这是效果图。对于程序的改动笔记在readme文件中。<br><img src="/images/pic3.jpg" alt="a"><br>在4000个地震中寻找重复地震大约需要7个小时左右。<br>仅此作为笔记</p>]]></content>
+      
+      
+        <tags>
+            
+            <tag> 重复地震 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>利用MCR脱离了matlab环境</title>
+      <link href="/2017/07/30/mcr-install/"/>
+      <url>/2017/07/30/mcr-install/</url>
+      <content type="html"><![CDATA[<h2 id="MCR在Ubuntu16-04-2-LTS安装"><a href="#MCR在Ubuntu16-04-2-LTS安装" class="headerlink" title="MCR在Ubuntu16.04.2-LTS安装"></a><strong>MCR在Ubuntu16.04.2-LTS安装</strong></h2><p>假设你有一大串matlab代码，想把这些代码移植到某个软件上，将matlab改写成C/C++无疑是最好的，但是很需要时间，比较简单的办法将m文件编译成动态库供C/C++调用，但这需要在本地安装MCR。这样就可以避免安装matlab了。</p><p>我的脑上本身就安装了matlab，MCR压缩包位于:</p><p><code>/usr/local/R2012a/toolbox/compiler/deploy/glnxa64/MCRInstaller.zip</code>，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo  mkdir  /usr/<span class="built_in">local</span>/R2012a/MATLAB_Compiler_Runtime</span><br><span class="line">sudo cp  /usr/<span class="built_in">local</span>/R2012a/toolbox/compiler/deploy/glnxa64/MCRInstaller.zip   /usr/<span class="built_in">local</span>/R2012a/MATLAB_Compiler_Runtime</span><br><span class="line">sudo chmod 777 /usr/<span class="built_in">local</span>/R2012a/MATLAB_Compiler_Runtime</span><br><span class="line">unzip MCRInstaller.zip</span><br><span class="line">./install</span><br></pre></td></tr></table></figure></p><p>将下面提示的动态路径添加到 ~/.bashrc 中</p><p><img src="/images/img/1.png" alt="matlab"><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"export  LD_LIBRARY_PATH=<span class="variable">$&#123;LD_LIBRARY_PATH&#125;</span>:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/runtime/glnxa64:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/bin/glnxa64:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/sys/os/glnxa64:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/sys/java/jre/glnxa64/jre/lib/amd64/server:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/sys/java/jre/glnxa64/jre/lib/amd64"</span> &gt;&gt;  ~/.bashrc</span><br><span class="line"><span class="built_in">source</span>  ~/.bashrc</span><br></pre></td></tr></table></figure></p><hr><h2 id="将-m文件编译成函数库（cpp）"><a href="#将-m文件编译成函数库（cpp）" class="headerlink" title="将.m文件编译成函数库（cpp）"></a><strong>将.m文件编译成函数库（cpp）</strong></h2><p>我有一个Cal_moment_tensor.m的matlab文件，用matlab打开，并在matlab终端运行这个命令</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mcc -W cpplib:libCal_moment_tensor -T link:lib Cal_moment_tensor</span><br></pre></td></tr></table></figure><p>通过以上命令产生了如下5个文件</p><p><img src="/images/img/2.png" alt="a"></p><blockquote><p>将<code>main.cpp</code>与以上5个文件放在一块，然后用以下命令编译得到可执行的<code>main</code></p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -o main -I. -I/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/extern/include -L. -L/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/runtime/glnxa64 -L/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/bin/glnxa64 main.cpp -lCal_moment_tensor -lm -lmwmclmcrrt -lmwmclmcr</span><br></pre></td></tr></table></figure><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mclmcrrt.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mclmcr.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mclcppclass.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"matrix.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"libCal_moment_tensor.h"</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="comment">// initialize lib</span></span><br><span class="line"><span class="keyword">if</span>( !libCal_moment_tensorInitialize())</span><br><span class="line">&#123;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Could not initialize libMyAdd!"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// using my function</span></span><br><span class="line">Cal_moment_tensor();</span><br><span class="line"></span><br><span class="line"><span class="comment">// terminate the lib</span></span><br><span class="line">libCal_moment_tensorTerminate();</span><br><span class="line"><span class="comment">// terminate MCR</span></span><br><span class="line">mclTerminateApplication();</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>其实对于参考[2]中C++参数说明很清楚，但对于C++很弱的人学习这个接口成本略高，最简单大办法把所有参数传递都用文件来实现。<br>以上例子请点击百度云<a href="https://pan.baidu.com/s/1slG0fwh" target="_blank" rel="noopener">链接</a>.<strong>密码h3u9</strong>,自行下载。</p><p><strong>另外注明:</strong></p><blockquote><ol><li>Ubuntu16.04的GCC 版本是 5.4.0的，因为在matlab上编译动态库的时候采用本地环境的GCC编译器，<strong>GCC版本很重要</strong>。</li></ol></blockquote><blockquote><ol start="2"><li>如果本地采用GCC 5.4.0编译的动态库，放到另外一台电脑，其GCC 为更低版本的如RedHat5.4系统自带的GCC 4.1.2 就会出错。</li></ol></blockquote><blockquote><ol start="3"><li><p>但低版本的GCC 编译出来的动态库可以放到高版本的GCC环境中用。</p></li><li><p>千万别去尝试在Ubuntu 16.04中自己编译安装GCC 4.1.2，会有很多问题的。</p></li></ol></blockquote><h2 id="报错集锦"><a href="#报错集锦" class="headerlink" title="报错集锦"></a>报错集锦</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">报错1:移植到红帽子5.4,GCC4.1.2上，原因是libmwmclmcr.so依赖的libstdc++.so.6并不是用MCR编译环境中的，而是先用系统中的库。</span><br></pre></td></tr></table></figure><p><img src="/images/img/cmp1.png" alt="c"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">报错2： 降低matlab版本，期待与GCC版本耦合，其实不然，2010版本支持GCC4.2, 见matlab安装目录下的sys/os/glnxa64/Readmelibstdc++，里面写了GCC版本;降低matlab版本; 这里出现的SSL，经过大神提醒，是少链接了一个ssl,在链接库时，加上一个 -lssl</span><br></pre></td></tr></table></figure></p><p><img src="/images/img/cmp4.png" alt="d"></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">报错4：消除了 -lssl导致的错误，然后是libmwmclmcr.so这个库一直不听话，报错，尽管是用的matlab2009,红帽子平台。最后放弃治疗。</span><br></pre></td></tr></table></figure><p><img src="/images/img/cmp5.png" alt="e"></p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>博主研究发现，其实是可以在不修改GCC版本的情况下，使得该编译在较低版本的GCC环境中编译成功。在这里我用到了以下几个查看库的命令</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ldd  libmwmclmcr.so #查看libmwmclmcr.so所依赖哪些库</span><br><span class="line"> </span><br><span class="line">strings libstdc++.so.6 | grep &quot;GLIB&quot;    #查看C++标准库支持的版本，对于GCC4.1.2,它自带的libstdc++.so是不支持&gt;=GLIB3.4.9。</span><br><span class="line"></span><br><span class="line">nm -D libmwmclmcr.so#列出.o .a .so中的符号信息，包括诸如符号的值，符号类型及符号名称等。所谓符号，通常指定义出的函数，全局变量。</span><br></pre></td></tr></table></figure><p><img src="/images/img/cmp2.png" alt="f"></p><p>下图是在红帽子的 <code>~/.bashrc</code>的配置以及<code>编译命令</code></p><p><img src="/images/img/cmp3.png" alt="g"><br>有了以上命令，我们可以大概确定哪些库没有链接上，这就很容易改正错误。我们把MCR装上，不就是因为担心其他平台上没有程序运行的环境吗？根据这个逻辑，我就没有折腾如何去安装这些库，直接在MCR中把这些库重名为系统库对应的名字，以及在~/.bashrc中的LD_LIBRARY_PATH中增加这些动态库的路径。最后运行成功！一开始若能定位到第一步出错在哪，就不会考虑替换GCC版本，替换matlab版本等思路。不然安装MCR又有何用？</p><p><strong>碰到这么多问题，总结一句吃了没文化的亏。:),不做怎么知道行与行不通，并没什么是一蹴而就。撸起袖子干！还有就是不让哥远程操作对方的系统，只能用虚拟机弄个相应的系统来做尝试</strong></p><hr><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><strong>参考</strong></h2><p>[1] <a href="http://blog.csdn.net/arackethis/article/details/43375943" target="_blank" rel="noopener">http://blog.csdn.net/arackethis/article/details/43375943</a><br>[2] <a href="http://developer.51cto.com/art/200909/150944.htm" target="_blank" rel="noopener">http://developer.51cto.com/art/200909/150944.htm</a><br>[3] <a href="http://www.cnblogs.com/itech/archive/2012/09/16/2687423.html" target="_blank" rel="noopener">http://www.cnblogs.com/itech/archive/2012/09/16/2687423.html</a></p>]]></content>
+      
+      <categories>
+          
+          <category> Matlab </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> MCR </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Software Collection</title>
+      <link href="/2017/07/29/software-md/"/>
+      <url>/2017/07/29/software-md/</url>
+      <content type="html"><![CDATA[<h1 id="Geopsy"><a href="#Geopsy" class="headerlink" title="Geopsy"></a>Geopsy</h1><p><a href="https://pan.baidu.com/s/1i501xUd" target="_blank" rel="noopener">Geopsy</a>存在百度云盘上， <strong>密码: szf7</strong></p>]]></content>
+      
+      <categories>
+          
+          <category> Collection </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Collection </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>初始用itchat</title>
+      <link href="/2017/07/18/itchat/"/>
+      <url>/2017/07/18/itchat/</url>
+      <content type="html"><![CDATA[<h2 id="itchat-无疑是逢年过节的利器"><a href="#itchat-无疑是逢年过节的利器" class="headerlink" title="itchat 无疑是逢年过节的利器"></a><strong>itchat 无疑是逢年过节的利器</strong></h2><hr><p>每当过年过节的都会接收到一些群发祝福，不回显得不礼貌，还有自己想偷懒也想来个群发微信，但又想让人看起来显得有诚意的真心祝福，还是在前面加个昵称比较好，当然这是说笑的了！我是认真的发微信的，没看到字里行间都透露着我对你们的爱么?</p><hr><p>开始实验</p><hr><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf8 #必须加上，不然汉字识别不了</span></span><br><span class="line"><span class="keyword">import</span> itchat,time</span><br><span class="line"><span class="comment">#这是自动登录网页的界面</span></span><br><span class="line"><span class="meta">@itchat.msg_register(itchat.content.TEXT)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_content</span><span class="params">(msg)</span>:</span></span><br><span class="line">        print(msg[<span class="string">'Text'</span>])</span><br><span class="line">        itchat.auto_login()</span><br><span class="line">        itchat.run()</span><br><span class="line">itchat.auto_login(hotReload=<span class="keyword">True</span>)</span><br><span class="line"><span class="comment">#测试给自己发送消息，在文件群助手中可以看到</span></span><br><span class="line">itchat.send(<span class="string">u'测试消息发送'</span>, <span class="string">'filehelper'</span>)</span><br><span class="line"><span class="comment">#搜寻好友名字itchat.search_friends</span></span><br><span class="line"><span class="comment">#其中remarkName是你在通讯录上备注的好友名字，请用unicode编码汉字什么的都在前面加上u</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#itchat.get_friends得到通讯录好友信息</span></span><br><span class="line">FD=itchat.get_friends(update=<span class="keyword">True</span>)[<span class="number">0</span>:]</span><br><span class="line"><span class="comment">#朋友备注名字</span></span><br><span class="line">myfriends=[<span class="string">u'胡汉三'</span>,<span class="string">u'张小明'</span>,<span class="string">u'钱多多'</span>,<span class="string">u'郭德刚'</span>,<span class="string">u'薛之谦'</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> FD:</span><br><span class="line">        name=i[<span class="string">'NickName'</span>]</span><br><span class="line">        remarkName=i[<span class="string">'RemarkName'</span>]</span><br><span class="line">        str=remarkName+<span class="string">u'  每天好心情:) :)'</span> <span class="comment"># 好友名字+祝福语</span></span><br><span class="line">        Username=i[<span class="string">'UserName'</span>]</span><br><span class="line">        <span class="keyword">if</span> remarkName <span class="keyword">in</span> myfriends:     <span class="comment">#从好友列表中选取你的几个好友</span></span><br><span class="line">                   <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">10</span>): <span class="comment">#循环不要太多100以下就好了</span></span><br><span class="line">                          itchat.send(str,toUserName=Username)</span><br><span class="line">                          time.sleep(<span class="number">.01</span>)  <span class="comment">#每隔0.1秒发一条信息</span></span><br></pre></td></tr></table></figure><hr><p>如果循环变多的话微信会让你停止发消息，导致你给其他人发消息受阻，请谨慎使用<br>其实这里面还有很多信息可以发觉，例如统计你微信好友中的男女比例，省份，签名等，FD变量中等着你发觉<br>不捣乱了</p>]]></content>
+      
+      <categories>
+          
+          <category> HaHa </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> itchat </tag>
+            
+        </tags>
+      
+    </entry>
+    
+  
+  
+</search>

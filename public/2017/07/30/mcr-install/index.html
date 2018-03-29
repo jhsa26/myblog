@@ -1,0 +1,1195 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="MCR," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="DBFT's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="MCR在Ubuntu16.04.2-LTS安装假设你有一大串matlab代码，想把这些代码移植到某个软件上，将matlab改写成C/C++无疑是最好的，但是很需要时间，比较简单的办法将m文件编译成动态库供C/C++调用，但这需要在本地安装MCR。这样就可以避免安装matlab了。 我的脑上本身就安装了matlab，MCR压缩包位于: /usr/local/R2012a/toolbox/compil">
+<meta name="keywords" content="MCR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用MCR脱离了matlab环境">
+<meta property="og:url" content="https://jhsa26.github.io/2017/07/30/mcr-install/index.html">
+<meta property="og:site_name" content="DBFT&#39;s Blog">
+<meta property="og:description" content="MCR在Ubuntu16.04.2-LTS安装假设你有一大串matlab代码，想把这些代码移植到某个软件上，将matlab改写成C/C++无疑是最好的，但是很需要时间，比较简单的办法将m文件编译成动态库供C/C++调用，但这需要在本地安装MCR。这样就可以避免安装matlab了。 我的脑上本身就安装了matlab，MCR压缩包位于: /usr/local/R2012a/toolbox/compil">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://jhsa26.github.io/images/img/1.png">
+<meta property="og:image" content="https://jhsa26.github.io/images/img/2.png">
+<meta property="og:image" content="https://jhsa26.github.io/images/img/cmp1.png">
+<meta property="og:image" content="https://jhsa26.github.io/images/img/cmp4.png">
+<meta property="og:image" content="https://jhsa26.github.io/images/img/cmp5.png">
+<meta property="og:image" content="https://jhsa26.github.io/images/img/cmp2.png">
+<meta property="og:image" content="https://jhsa26.github.io/images/img/cmp3.png">
+<meta property="og:updated_time" content="2018-03-29T09:31:46.230Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用MCR脱离了matlab环境">
+<meta name="twitter:description" content="MCR在Ubuntu16.04.2-LTS安装假设你有一大串matlab代码，想把这些代码移植到某个软件上，将matlab改写成C/C++无疑是最好的，但是很需要时间，比较简单的办法将m文件编译成动态库供C/C++调用，但这需要在本地安装MCR。这样就可以避免安装matlab了。 我的脑上本身就安装了matlab，MCR压缩包位于: /usr/local/R2012a/toolbox/compil">
+<meta name="twitter:image" content="https://jhsa26.github.io/images/img/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 利用MCR脱离了matlab环境 | DBFT's Blog  -  </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '',
+      xfbml      : true,
+      version    : 'v2.5'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/zh_Hans/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">DBFT's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle" id="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button onclick="showSubtitle()">
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav" id="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar-check-o"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sunshine">
+          <a href="/sunshine" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br />
+            
+            阳光
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                利用MCR脱离了matlab环境
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-07-30T08:35:57+08:00" content="2017-07-30">
+              2017-07-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Matlab/" itemprop="url" rel="index">
+                    <span itemprop="name">Matlab</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/07/30/mcr-install/" class="leancloud_visitors" data-flag-title="利用MCR脱离了matlab环境" style="display:true">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+              &nbsp; | &nbsp;
+              <span class="page-pv"><i class="fa fa-file-o"></i>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+              </span>
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MCR在Ubuntu16-04-2-LTS安装"><a href="#MCR在Ubuntu16-04-2-LTS安装" class="headerlink" title="MCR在Ubuntu16.04.2-LTS安装"></a><strong>MCR在Ubuntu16.04.2-LTS安装</strong></h2><p>假设你有一大串matlab代码，想把这些代码移植到某个软件上，将matlab改写成C/C++无疑是最好的，但是很需要时间，比较简单的办法将m文件编译成动态库供C/C++调用，但这需要在本地安装MCR。这样就可以避免安装matlab了。</p>
+<p>我的脑上本身就安装了matlab，MCR压缩包位于:</p>
+<p><code>/usr/local/R2012a/toolbox/compiler/deploy/glnxa64/MCRInstaller.zip</code>，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo  mkdir  /usr/<span class="built_in">local</span>/R2012a/MATLAB_Compiler_Runtime</span><br><span class="line">sudo cp  /usr/<span class="built_in">local</span>/R2012a/toolbox/compiler/deploy/glnxa64/MCRInstaller.zip   /usr/<span class="built_in">local</span>/R2012a/MATLAB_Compiler_Runtime</span><br><span class="line">sudo chmod 777 /usr/<span class="built_in">local</span>/R2012a/MATLAB_Compiler_Runtime</span><br><span class="line">unzip MCRInstaller.zip</span><br><span class="line">./install</span><br></pre></td></tr></table></figure></p>
+<p>将下面提示的动态路径添加到 ~/.bashrc 中</p>
+<p><img src="/images/img/1.png" alt="matlab"><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"export  LD_LIBRARY_PATH=<span class="variable">$&#123;LD_LIBRARY_PATH&#125;</span>:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/runtime/glnxa64:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/bin/glnxa64:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/sys/os/glnxa64:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/sys/java/jre/glnxa64/jre/lib/amd64/server:/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/sys/java/jre/glnxa64/jre/lib/amd64"</span> &gt;&gt;  ~/.bashrc</span><br><span class="line"><span class="built_in">source</span>  ~/.bashrc</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="将-m文件编译成函数库（cpp）"><a href="#将-m文件编译成函数库（cpp）" class="headerlink" title="将.m文件编译成函数库（cpp）"></a><strong>将.m文件编译成函数库（cpp）</strong></h2><p>我有一个Cal_moment_tensor.m的matlab文件，用matlab打开，并在matlab终端运行这个命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mcc -W cpplib:libCal_moment_tensor -T link:lib Cal_moment_tensor</span><br></pre></td></tr></table></figure>
+<p>通过以上命令产生了如下5个文件</p>
+<p><img src="/images/img/2.png" alt="a"></p>
+<blockquote>
+<p>将<code>main.cpp</code>与以上5个文件放在一块，然后用以下命令编译得到可执行的<code>main</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -o main -I. -I/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/extern/include -L. -L/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/runtime/glnxa64 -L/usr/local/MATLAB/R2012a/MATLAB_Compiler_Runtime/v717/bin/glnxa64 main.cpp -lCal_moment_tensor -lm -lmwmclmcrrt -lmwmclmcr</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mclmcrrt.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mclmcr.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mclcppclass.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"matrix.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"libCal_moment_tensor.h"</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="comment">// initialize lib</span></span><br><span class="line"><span class="keyword">if</span>( !libCal_moment_tensorInitialize())</span><br><span class="line">&#123;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Could not initialize libMyAdd!"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"><span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// using my function</span></span><br><span class="line">Cal_moment_tensor();</span><br><span class="line"></span><br><span class="line"><span class="comment">// terminate the lib</span></span><br><span class="line">libCal_moment_tensorTerminate();</span><br><span class="line"><span class="comment">// terminate MCR</span></span><br><span class="line">mclTerminateApplication();</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实对于参考[2]中C++参数说明很清楚，但对于C++很弱的人学习这个接口成本略高，最简单大办法把所有参数传递都用文件来实现。<br>以上例子请点击百度云<a href="https://pan.baidu.com/s/1slG0fwh" target="_blank" rel="noopener">链接</a>.<strong>密码h3u9</strong>,自行下载。</p>
+<p><strong>另外注明:</strong></p>
+<blockquote>
+<ol>
+<li>Ubuntu16.04的GCC 版本是 5.4.0的，因为在matlab上编译动态库的时候采用本地环境的GCC编译器，<strong>GCC版本很重要</strong>。</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>如果本地采用GCC 5.4.0编译的动态库，放到另外一台电脑，其GCC 为更低版本的如RedHat5.4系统自带的GCC 4.1.2 就会出错。</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li><p>但低版本的GCC 编译出来的动态库可以放到高版本的GCC环境中用。</p>
+</li>
+<li><p>千万别去尝试在Ubuntu 16.04中自己编译安装GCC 4.1.2，会有很多问题的。</p>
+</li>
+</ol>
+</blockquote>
+<h2 id="报错集锦"><a href="#报错集锦" class="headerlink" title="报错集锦"></a>报错集锦</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">报错1:移植到红帽子5.4,GCC4.1.2上，原因是libmwmclmcr.so依赖的libstdc++.so.6并不是用MCR编译环境中的，而是先用系统中的库。</span><br></pre></td></tr></table></figure>
+<p><img src="/images/img/cmp1.png" alt="c"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">报错2： 降低matlab版本，期待与GCC版本耦合，其实不然，2010版本支持GCC4.2, 见matlab安装目录下的sys/os/glnxa64/Readmelibstdc++，里面写了GCC版本;降低matlab版本; 这里出现的SSL，经过大神提醒，是少链接了一个ssl,在链接库时，加上一个 -lssl</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/img/cmp4.png" alt="d"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">报错4：消除了 -lssl导致的错误，然后是libmwmclmcr.so这个库一直不听话，报错，尽管是用的matlab2009,红帽子平台。最后放弃治疗。</span><br></pre></td></tr></table></figure>
+<p><img src="/images/img/cmp5.png" alt="e"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>博主研究发现，其实是可以在不修改GCC版本的情况下，使得该编译在较低版本的GCC环境中编译成功。在这里我用到了以下几个查看库的命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ldd  libmwmclmcr.so 					#查看libmwmclmcr.so所依赖哪些库</span><br><span class="line"> </span><br><span class="line">strings libstdc++.so.6 | grep &quot;GLIB&quot;    #查看C++标准库支持的版本，对于GCC4.1.2,它自带的libstdc++.so是不支持&gt;=GLIB3.4.9。</span><br><span class="line"></span><br><span class="line">nm -D libmwmclmcr.so					#列出.o .a .so中的符号信息，包括诸如符号的值，符号类型及符号名称等。所谓符号，通常指定义出的函数，全局变量。</span><br></pre></td></tr></table></figure>
+<p><img src="/images/img/cmp2.png" alt="f"></p>
+<p>下图是在红帽子的 <code>~/.bashrc</code>的配置以及<code>编译命令</code></p>
+<p><img src="/images/img/cmp3.png" alt="g"><br>有了以上命令，我们可以大概确定哪些库没有链接上，这就很容易改正错误。我们把MCR装上，不就是因为担心其他平台上没有程序运行的环境吗？根据这个逻辑，我就没有折腾如何去安装这些库，直接在MCR中把这些库重名为系统库对应的名字，以及在~/.bashrc中的LD_LIBRARY_PATH中增加这些动态库的路径。最后运行成功！一开始若能定位到第一步出错在哪，就不会考虑替换GCC版本，替换matlab版本等思路。不然安装MCR又有何用？</p>
+<p><strong>碰到这么多问题，总结一句吃了没文化的亏。:),不做怎么知道行与行不通，并没什么是一蹴而就。撸起袖子干！还有就是不让哥远程操作对方的系统，只能用虚拟机弄个相应的系统来做尝试</strong></p>
+<hr>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><strong>参考</strong></h2><p>[1] <a href="http://blog.csdn.net/arackethis/article/details/43375943" target="_blank" rel="noopener">http://blog.csdn.net/arackethis/article/details/43375943</a><br>[2] <a href="http://developer.51cto.com/art/200909/150944.htm" target="_blank" rel="noopener">http://developer.51cto.com/art/200909/150944.htm</a><br>[3] <a href="http://www.cnblogs.com/itech/archive/2012/09/16/2687423.html" target="_blank" rel="noopener">http://www.cnblogs.com/itech/archive/2012/09/16/2687423.html</a></p>
+
+      
+    </div>
+
+	<div>
+      
+        
+      
+    </div>
+	
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+	
+	<div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MCR/" rel="tag">#MCR</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/15/FindEarth/" class="post-nav-title-link" rel="prev" title="寻找重复地震">
+                <i class="fa fa-chevron-left"></i> 寻找重复地震 
+              </a>
+            
+          </div>
+		  
+		  <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/29/software-md/" class="post-nav-title-link" rel="next" title="Software Collection">
+                Software Collection  <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+	
+  </div>
+
+
+          </div>
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/pic2.jpg"
+               alt="DBFT" />
+          <p class="site-author-name" itemprop="name">DBFT</p>
+          <p class="site-description motion-element" itemprop="description">不积跬步无以至千里</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives/ || archive">
+              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/ || th">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/   ||">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" target="_blank" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+			
+			<a title="小high一下~" rel="alternate" class="mw-harlem_shake_slow wobble shake" href="javascript:shake()"><i class="fa fa-music"></i> High</a>
+
+<script type="text/JavaScript">
+function shake() {
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+ 
+    function S() {
+        var e = document.createElement("audio");
+        e.setAttribute("class", l);
+        e.src = i;
+        e.loop = false;
+        e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h()
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+ 
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+    var i = "http://o9w8f1xrl.bkt.clouddn.com/highqilai/harlem-shake.mp3";
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "http://o9w8f1xrl.bkt.clouddn.com/highqilai/harlem-shake-style.css";
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+}
+</script>
+			
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jhsa26" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MCR在Ubuntu16-04-2-LTS安装"><span class="nav-text">MCR在Ubuntu16.04.2-LTS安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将-m文件编译成函数库（cpp）"><span class="nav-text">将.m文件编译成函数库（cpp）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#报错集锦"><span class="nav-text">报错集锦</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  Tue Jul 18 2017 08:00:00 GMT+0800 (CST) - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">DBFT</span>
+  
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io" target="_blank">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank">
+    NexT.Pisces
+  </a>
+</div>
+
+<div style="padding-top:1px;">
+ <span>鄂ICP备16017973号</span>
+</div>
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+    
+	  <div class="side-buttons">
+  <div class="side-buttons-box mobile_code">
+    <span class="bt-left"><i class="fa fa-mobile-phone fa-2x" title="手机访问"></i></span><span style="font-size:1px;display:inline-block;line-height:16px;clear:both;">扫二维码</span>
+	<div class="code_img"><i></i><img src="/images/blog.png" alt="扫一扫，用手机访问本站"><p>扫一扫，用手机访问本站</p></div>
+  </div>
+  <div class="side-buttons-box mail_box">
+    <a href="mailto:wuxubj@qq.com"><span class="bt-left"><i class="fa fa-envelope-o fa-lg" title="发送邮件"></i></span><span style="font-size:1px;display:inline-block;line-height:16px;clear:both;">发送邮件</span></a>
+  </div>
+</div>
+	
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up fa-2x" title="回到顶部"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+
+
+
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("", "");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+  <script type="text/JavaScript">
+function hideElement(elementID)
+{
+	var myele=document.getElementById(elementID);
+	myele.style.display="none";
+}
+
+function showElement(elementID)
+{
+	var myele=document.getElementById(elementID);
+	myele.style.display="block";
+}
+
+function showSubtitle()
+{
+  var siteNav=document.getElementById("site-nav");
+  if(siteNav.style.display=="block")
+  {
+   var subTitle=document.getElementById("site-subtitle");
+   subTitle.style.display="none";
+  }else
+  {
+   var subTitle=document.getElementById("site-subtitle");
+   subTitle.style.display="block";
+  }
+}
+</script>
+
+  
+	  <script type="text/JavaScript">
+!function(){function n(n,e,t){return n.getAttribute(e)||t}function e(n){return document.getElementsByTagName(n)}function t(){var t=e("script"),o=t.length,i=t[o-1];return{l:o,z:n(i,"zIndex",-1),o:n(i,"opacity",.5),c:n(i,"color","0,0,0"),n:n(i,"count",99)}}function o(){c=u.width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth,a=u.height=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight}function i(){l.clearRect(0,0,c,a);var n,e,t,o,u,d,x=[w].concat(y);y.forEach(function(i){for(i.x+=i.xa,i.y+=i.ya,i.xa*=i.x>c||i.x<0?-1:1,i.ya*=i.y>a||i.y<0?-1:1,l.fillRect(i.x-.5,i.y-.5,1,1),e=0;e<x.length;e++)n=x[e],i!==n&&null!==n.x&&null!==n.y&&(o=i.x-n.x,u=i.y-n.y,d=o*o+u*u,d<n.max&&(n===w&&d>=n.max/2&&(i.x-=.03*o,i.y-=.03*u),t=(n.max-d)/n.max,l.beginPath(),l.lineWidth=t/2,l.strokeStyle="rgba("+m.c+","+(t+.2)+")",l.moveTo(i.x,i.y),l.lineTo(n.x,n.y),l.stroke()));x.splice(x.indexOf(i),1)}),r(i)}var c,a,u=document.createElement("canvas"),m=t(),d="c_n"+m.l,l=u.getContext("2d"),r=window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(n){window.setTimeout(n,1e3/45)},x=Math.random,w={x:null,y:null,max:2e4};u.id=d,u.style.cssText="position:fixed;top:0;left:0;z-index:"+m.z+";opacity:"+m.o,e("body")[0].appendChild(u),o(),window.onresize=o,window.onmousemove=function(n){n=n||window.event,w.x=n.clientX,w.y=n.clientY},window.onmouseout=function(){w.x=null,w.y=null};for(var y=[],s=0;m.n>s;s++){var f=x()*c,h=x()*a,g=2*x()-1,p=2*x()-1;y.push({x:f,y:h,xa:g,ya:p,max:6e3})}setTimeout(function(){i()},100)}();
+</script>
+
+	
+  
+
+</body>
+</html>
